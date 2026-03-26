@@ -1,171 +1,277 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#000000">
     <title>POSN Tutor - Teng Neung</title>
     
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIlBPU04gQ29tcHV0ZXIgUGxhbm5lciIsCiAgInNob3J0X25hbWUiOiAiUE9TTiBQbGFuIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmOGZhZmMiLAogICJ0aGVtZV9jb2xvciI6ICIjMjU2M2ViIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsYXRpY29uLmNvbS81MTIvMzI0Mi8zMjQyMjM0LnBuZyIsCiAgICAgICJzaXplcyI6ICI1MTJ4NTEyIiwKICAgICAgInR5cGUiOiAiaW1hZ2UvcG5nIgogICAgfQogIF0KfQ==">
-
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
+        /* ตัวแปรสีสำหรับโหมดสว่าง (Default) */
         :root {
-            --primary: #2563eb;
-            --math-color: #f59e0b;
-            --comp-color: #10b981;
-            --bg: #f8fafc;
-            --text: #1e293b;
+            --bg: #ffffff;
+            --text: #000000;
+            --border-color: #000000;
+            --shadow-color: #000000;
+            --done-bg: #f0f0f0;
+            --done-text: #555555;
+            --rest-bg: #e0e0e0;
         }
+
+        /* ตัวแปรสีสำหรับโหมดมืด */
+        [data-theme="dark"] {
+            --bg: #0f0f0f;
+            --text: #ffffff;
+            --border-color: #ffffff;
+            --shadow-color: #ffffff;
+            --done-bg: #1a1a1a;
+            --done-text: #aaaaaa;
+            --rest-bg: #222222;
+        }
+        
         * { box-sizing: border-box; }
+        
         body { 
             font-family: 'Sarabun', sans-serif; 
             background: var(--bg); 
             color: var(--text);
             margin: 0; 
-            padding: 15px;
-            padding-bottom: 80px; 
-        }
-        .container { max-width: 600px; margin: auto; }
-        
-        header { 
-            /* ทำให้ Header ลอยติดขอบบนและโปร่งแสงนิดๆ */
-            position: sticky;
-            top: 10px;
-            z-index: 100;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(29, 78, 216, 0.95));
-            backdrop-filter: blur(8px);
-            color: white;
             padding: 20px;
-            border-radius: 15px;
+            padding-bottom: 80px; 
+            /* ลายจุดพื้นหลังที่เปลี่ยนสีตามโหมด */
+            background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container { max-width: 650px; margin: auto; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        header { 
+            position: sticky;
+            top: 15px;
+            z-index: 100;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0px var(--shadow-color);
             text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            margin-bottom: 30px;
             transition: all 0.3s ease;
+        }
+        
+        header h2 { margin: 0; font-size: 1.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+        header small { font-weight: bold; background: var(--text); color: var(--bg); padding: 2px 8px; margin-top: 5px; display: inline-block; transition: all 0.3s ease;}
+
+        /* ปุ่มสลับโหมด */
+        .theme-btn {
+            margin-top: 15px;
+            background: var(--bg);
+            color: var(--text);
+            border: 2px solid var(--border-color);
+            padding: 5px 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-btn:hover {
+            background: var(--text);
+            color: var(--bg);
         }
 
         .stats-bar {
-            background: white;
+            background: var(--bg);
+            color: var(--text);
             padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+            margin-bottom: 30px;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
 
-        /* ตกแต่ง Progress Bar */
         .progress-container {
             width: 100%;
-            background-color: #e2e8f0;
-            border-radius: 10px;
-            margin-top: 10px;
-            height: 12px;
-            overflow: hidden;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg);
+            margin-top: 12px;
+            height: 20px;
+            position: relative;
         }
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--comp-color));
+            background: var(--text);
             width: 0%;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 10px;
+            transition: width 0.5s steps(20, end);
         }
 
         .motivation {
-            text-align: center;
+            text-align: right;
             font-size: 0.85rem;
-            color: #64748b;
-            margin-top: 10px;
-            font-weight: normal;
+            margin-top: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .week-card { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 15px; 
-            margin-bottom: 25px; 
-            border-left: 5px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background: var(--bg); 
+            border: 3px solid var(--border-color);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+            padding: 20px; 
+            margin-bottom: 30px; 
+            transition: all 0.3s ease;
         }
-        .week-header { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; color: var(--primary); }
+        .week-header { 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            margin-bottom: 15px; 
+            border-bottom: 2px dashed var(--border-color);
+            padding-bottom: 5px;
+            text-transform: uppercase;
+        }
 
         .day-box { 
-            background: #f1f5f9;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease; /* เพิ่ม Transition เวลากดหรือ Hover */
-            border: 1px solid transparent;
+            background: var(--bg);
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+            position: relative;
         }
         .day-box:hover {
-            transform: translateX(4px);
-            border-color: #cbd5e1;
-            box-shadow: -2px 4px 8px rgba(0,0,0,0.05);
+            transform: translate(-3px, -3px);
+            box-shadow: 4px 4px 0px var(--shadow-color);
         }
 
-        .day-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .date-label { font-weight: bold; font-size: 0.9rem; }
+        .day-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
+        .date-label { font-weight: 800; font-size: 1rem; }
         
-        .tag { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; color: white; font-weight: bold; }
-        .tag-math { background: var(--math-color); }
-        .tag-comp { background: var(--comp-color); }
-        .tag-rest { background: #94a3b8; }
+        .tag { 
+            padding: 2px 8px; 
+            font-size: 0.8rem; 
+            font-weight: 800;
+            border: 2px solid var(--border-color);
+            text-transform: uppercase;
+        }
+        .tag-math { background: var(--bg); color: var(--text); }
+        .tag-comp { background: var(--text); color: var(--bg); }
+        .tag-rest { background: var(--rest-bg); color: var(--text); border-style: dashed; }
 
         .note-input {
             width: 100%;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            background: var(--bg);
+            color: var(--text);
             padding: 10px;
-            font-family: inherit;
-            font-size: 0.85rem;
-            margin-top: 8px;
-            resize: none;
-            transition: border-color 0.2s;
+            font-family: 'JetBrains Mono', 'Sarabun', monospace;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            resize: vertical;
+            min-height: 60px;
+            transition: all 0.2s;
         }
         .note-input:focus {
             outline: none;
-            border-color: var(--primary);
+            background: var(--text);
+            color: var(--bg);
         }
 
-        .check-wrapper { display: flex; align-items: center; gap: 8px; font-size: 0.95rem; margin-top: 8px; cursor: pointer; user-select: none; }
-        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--comp-color); }
+        .check-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 1rem; 
+            font-weight: 700;
+            margin-top: 10px; 
+            cursor: pointer; 
+            user-select: none; 
+        }
+        
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            background: var(--bg);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.1s;
+        }
 
-        /* การทำไฮไลท์เมื่อติ๊กแล้ว */
+        input[type="checkbox"]:checked {
+            background: var(--text);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: 'X';
+            position: absolute;
+            color: var(--bg);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            font-size: 16px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         .done { 
-            opacity: 0.7; 
-            background: #e2e8f0; 
-            border-left: 4px solid var(--comp-color);
+            background: var(--done-bg); 
+            opacity: 0.8;
+            border-style: dashed;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+        .done .date-label, .done .check-wrapper {
+            text-decoration: line-through;
+            color: var(--done-text);
         }
 
-        .footer-info { text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 30px; }
+        .footer-info { 
+            text-align: center; 
+            font-weight: bold;
+            font-size: 0.9rem; 
+            margin-top: 40px; 
+            background: var(--text);
+            color: var(--bg);
+            padding: 15px;
+            border: 3px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h2 style="margin:0">POSN Study Roadmap 💻</h2>
-        <small style="opacity: 0.9;">Teng Neung's Learning Journey</small>
+        <h2 class="mono">POSN.exe</h2>
+        <small class="mono">USER: TENG_NEUNG</small>
+        <br>
+        <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">[ THEME: LIGHT ]</button>
     </header>
 
-    <div class="stats-bar">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <span>Progress: <span id="progress-text" style="color:var(--primary)">0%</span></span>
-            <span><span id="days-count">0</span> Days Completed</span>
+    <div class="stats-bar mono">
+        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid var(--border-color); padding-bottom: 5px;">
+            <span>STATUS: <span id="progress-text">0%</span></span>
+            <span><span id="days-count">0</span> DAYS LOGGED</span>
         </div>
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
-        <div class="motivation" id="motivation-text">ก้าวแรกสำคัญที่สุด เริ่มลุยกันเลย! 🔥</div>
+        <div class="motivation" id="motivation-text">SYSTEM READY.</div>
     </div>
 
     <div id="app-content"></div>
 
-    <div class="footer-info">
-        บันทึกข้อมูลอัตโนมัติในเครื่องของคุณ 💾<br>
-        1 เม.ย. - 30 ส.ค. 2569
+    <div class="footer-info mono">
+        > LOCAL_STORAGE_ACTIVE: TRUE<br>
+        > TIMEFRAME: 01.04.2026 - 30.08.2026
     </div>
 </div>
 
@@ -173,7 +279,28 @@
     const startDate = new Date(2026, 3, 1); 
     const endDate = new Date(2026, 7, 30); 
 
+    // ระบบ Theme
+    function initTheme() {
+        const savedTheme = localStorage.getItem('posn_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeBtnText(savedTheme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('posn_theme', newTheme);
+        updateThemeBtnText(newTheme);
+    }
+
+    function updateThemeBtnText(theme) {
+        document.getElementById('themeToggle').innerText = theme === 'light' ? '[ THEME: LIGHT ]' : '[ THEME: DARK ]';
+    }
+
     function initApp() {
+        initTheme(); // โหลดธีมก่อนสร้าง UI
+        
         const content = document.getElementById('app-content');
         let current = new Date(startDate);
         let weekIdx = 1;
@@ -181,7 +308,7 @@
         while (current <= endDate) {
             let weekCard = document.createElement('div');
             weekCard.className = 'week-card';
-            weekCard.innerHTML = `<div class="week-header">สัปดาห์ที่ ${weekIdx}</div>`;
+            weekCard.innerHTML = `<div class="week-header mono">WEEK_${String(weekIdx).padStart(2, '0')}</div>`;
 
             for (let d = 0; d < 7; d++) {
                 if (current > endDate) break;
@@ -197,30 +324,30 @@
                     hours = (dayOfWeek === 0 || dayOfWeek === 6) ? 0 : 3;
                 }
 
-                let subject = (weekIdx % 2 !== 0) ? "คณิตศาสตร์ 📐" : "คอมพิวเตอร์ 💻";
+                let subject = (weekIdx % 2 !== 0) ? "[ MATH ]" : "[ CODE ]";
                 let tagClass = (weekIdx % 2 !== 0) ? "tag-math" : "tag-comp";
                 
                 if (hours === 0) {
-                    subject = "วันพักผ่อน ☕";
+                    subject = "[ REST ]";
                     tagClass = "tag-rest";
                 }
 
-                const dateStr = current.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', month: 'short' });
+                const dateStr = current.toLocaleDateString('en-CA'); 
+                const displayDate = current.toLocaleDateString('th-TH', { weekday: 'short', day: '2-digit', month: 'short' });
                 const storageKey = `posn_${current.getTime()}`;
 
-                // เปลี่ยน oninput เป็น onchange เพื่อลดภาระการเซฟข้อมูล
                 const dayHtml = `
                     <div class="day-box" id="box-${storageKey}">
                         <div class="day-info">
-                            <span class="date-label">${dateStr}</span>
-                            <span class="tag ${tagClass}">${subject} ${hours > 0 ? '('+hours+' ชม.)' : ''}</span>
+                            <span class="date-label mono">${dateStr} | ${displayDate}</span>
+                            <span class="tag mono ${tagClass}">${subject} ${hours > 0 ? hours+'H' : ''}</span>
                         </div>
                         <label class="check-wrapper">
                             <input type="checkbox" id="chk-${storageKey}" onchange="updateData('${storageKey}', event)"> 
-                            อ่านจบแล้ว
+                            TASK_COMPLETED
                         </label>
                         <textarea class="note-input" id="note-${storageKey}" 
-                            placeholder="เพิ่มโน้ตหรือความเข้าใจในวันนี้..." 
+                            placeholder="> Input notes here..." 
                             onchange="updateNote('${storageKey}')"></textarea>
                     </div>
                 `;
@@ -248,8 +375,7 @@
 
         if(isChecked) {
             box.classList.add('done');
-            // ยิงพลุเมื่อกดเช็คว่าอ่านจบ
-            fireConfetti(event);
+            fireMonochromeConfetti(event);
         } else {
             box.classList.remove('done');
         }
@@ -260,17 +386,17 @@
         calculateProgress();
     }
 
-    function fireConfetti(event) {
-        // หาตำแหน่งที่คลิกเพื่อยิงพลุออกมาจากตรงนั้น
+    function fireMonochromeConfetti(event) {
         const rect = event.target.getBoundingClientRect();
         const x = (rect.left + (rect.width / 2)) / window.innerWidth;
         const y = (rect.top + (rect.height / 2)) / window.innerHeight;
 
         confetti({
-            particleCount: 40,
-            spread: 60,
+            particleCount: 50,
+            spread: 70,
             origin: { x: x, y: y },
-            colors: ['#2563eb', '#10b981', '#f59e0b'],
+            colors: ['#000000', '#333333', '#888888', '#ffffff'], 
+            shapes: ['square'], 
             disableForReducedMotion: true
         });
     }
@@ -295,25 +421,16 @@
         const checked = document.querySelectorAll('input[type="checkbox"]:checked');
         const percent = checks.length > 0 ? Math.round((checked.length / checks.length) * 100) : 0;
         
-        // อัปเดตตัวเลขและหลอดพลัง
         document.getElementById('progress-text').innerText = percent + '%';
         document.getElementById('days-count').innerText = checked.length + ' / ' + checks.length;
         document.getElementById('progress-bar').style.width = percent + '%';
 
-        // เปลี่ยนข้อความให้กำลังใจตามความคืบหน้า
         const motivationEl = document.getElementById('motivation-text');
-        if (percent === 0) motivationEl.innerText = "ก้าวแรกสำคัญที่สุด เริ่มลุยกันเลย! 🔥";
-        else if (percent < 25) motivationEl.innerText = "เริ่มต้นได้สวย ทำต่อไปเรื่อยๆ นะ! 💪";
-        else if (percent < 50) motivationEl.innerText = "มาได้เกือบครึ่งทางแล้ว ความพยายามไม่ทรยศใคร! 🚀";
-        else if (percent < 75) motivationEl.innerText = "เกินครึ่งทางแล้ว! เป้าหมายอยู่ไม่ไกลเกินเอื้อม 🏆";
-        else if (percent < 100) motivationEl.innerText = "โค้งสุดท้ายแล้ว สู้ๆ สบายมาก! ⚡";
-        else motivationEl.innerText = "ยินดีด้วย! คุณพร้อมสำหรับสนามสอบแล้ว 🎉🎉🎉";
-    }
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            console.log('App Ready');
-        });
+        if (percent === 0) motivationEl.innerText = "WAITING FOR INPUT...";
+        else if (percent < 30) motivationEl.innerText = "PROCESSING...";
+        else if (percent < 70) motivationEl.innerText = "COMPILING SKILLS...";
+        else if (percent < 100) motivationEl.innerText = "EXECUTING FINAL PHASE...";
+        else motivationEl.innerText = "ALL TASKS COMPLETED. READY FOR POSN.";
     }
 
     initApp();
